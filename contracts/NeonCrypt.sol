@@ -164,6 +164,37 @@ contract NeonCrypt is SepoliaConfig {
         return _totalMessages;
     }
 
+    /// @notice Get multiple messages by their IDs in a single call
+    /// @param messageIds Array of message IDs to retrieve
+    /// @return timestamps Array of timestamps for each message
+    /// @return senders Array of sender addresses for each message
+    /// @return activeStatuses Array of active status flags for each message
+    function getMessagesBatch(uint256[] calldata messageIds)
+        external
+        view
+        returns (
+            uint256[] memory timestamps,
+            address[] memory senders,
+            bool[] memory activeStatuses
+        )
+    {
+        uint256 length = messageIds.length;
+        timestamps = new uint256[](length);
+        senders = new address[](length);
+        activeStatuses = new bool[](length);
+
+        for (uint256 i = 0; i < length; i++) {
+            uint256 msgId = messageIds[i];
+            require(msgId < _totalMessages, "Message does not exist");
+            Message storage msg_ = _messages[msgId];
+            timestamps[i] = msg_.timestamp;
+            senders[i] = msg_.sender;
+            activeStatuses[i] = msg_.isActive;
+        }
+
+        return (timestamps, senders, activeStatuses);
+    }
+
     /// @notice Delete a message (soft delete - marks as inactive)
     /// @param messageId The ID of the message to delete
     /// @dev Only the message sender can delete their own message
