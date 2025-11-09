@@ -19,7 +19,7 @@ export const ChatInput = ({ onSend, disabled = false }: ChatInputProps) => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -34,7 +34,7 @@ export const ChatInput = ({ onSend, disabled = false }: ChatInputProps) => {
             <Input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder={disabled ? "Connect wallet to send messages..." : "Type your message..."}
               disabled={disabled}
               className="bg-background border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
