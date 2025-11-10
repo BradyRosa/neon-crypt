@@ -326,18 +326,49 @@ export async function encryptUint32(
 ): Promise<{ handle: `0x${string}`; inputProof: `0x${string}` }> {
   console.log("[FHEVM] encryptUint32 called with value:", value);
 
-  const instance = await getFhevmInstance(provider, contractAddress, userAddress);
-  console.log("[FHEVM] Got instance, creating encrypted input...");
+  // Validate input parameters
+  if (value < 0 || value > 4294967295) {
+    throw new Error(`Invalid uint32 value: ${value}. Must be between 0 and 4294967295.`);
+  }
+
+  if (!contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+    throw new Error("Invalid contract address provided for encryption.");
+  }
+
+  if (!userAddress || userAddress === "0x0000000000000000000000000000000000000000") {
+    throw new Error("Invalid user address provided for encryption.");
+  }
+
+  let instance;
+  try {
+    instance = await getFhevmInstance(provider, contractAddress, userAddress);
+    console.log("[FHEVM] Got instance, creating encrypted input...");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to initialize FHEVM instance: ${errorMessage}`);
+  }
+
   console.log("[FHEVM] Contract address:", contractAddress);
   console.log("[FHEVM] User address:", userAddress);
 
-  const input = instance.createEncryptedInput(contractAddress, userAddress);
-  console.log("[FHEVM] Adding value to input...");
-  const encryptedInput = input.add32(value);
+  let encrypted;
+  try {
+    const input = instance.createEncryptedInput(contractAddress, userAddress);
+    console.log("[FHEVM] Adding value to input...");
+    const encryptedInput = input.add32(value);
 
-  console.log("[FHEVM] Encrypting (this may take a moment)...");
-  const encrypted = await encryptedInput.encrypt();
-  console.log("[FHEVM] Encryption complete");
+    console.log("[FHEVM] Encrypting (this may take a moment)...");
+    encrypted = await encryptedInput.encrypt();
+    console.log("[FHEVM] Encryption complete");
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Encryption failed: ${errorMessage}. Please try again.`);
+  }
+
+  if (!encrypted.handles || encrypted.handles.length === 0) {
+    throw new Error("Encryption produced no handles. This may indicate a WASM loading issue.");
+  }
+
   console.log("[FHEVM] Handle:", toHexString(encrypted.handles[0]));
 
   return {
