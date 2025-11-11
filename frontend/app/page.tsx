@@ -37,6 +37,7 @@ export default function Home() {
   const publicClient = usePublicClient();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Get contract address for current chain
   let contractAddress: `0x${string}` | undefined;
@@ -108,6 +109,20 @@ export default function Home() {
   }, [userMessageIds, contractAddress, address, publicClient]);
 
   const handleConnect = () => {};
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    try {
+      await refetchMessages();
+      toast.success("Messages refreshed");
+    } catch (error) {
+      console.error("Refresh error:", error);
+      toast.error("Failed to refresh messages");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleSendMessage = async (message: string) => {
     if (!walletClient || !address || !contractAddress) {
@@ -208,6 +223,32 @@ export default function Home() {
 
       <ScrollArea className="flex-1 container mx-auto px-4 py-6">
         <div className="space-y-4 max-w-4xl mx-auto">
+          {isConnected && contractAddress && (
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing || isLoading}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground bg-card border border-border rounded-md hover:bg-muted transition-colors disabled:opacity-50"
+                title="Refresh messages"
+              >
+                <svg
+                  className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                {isRefreshing ? "Refreshing..." : "Refresh"}
+              </button>
+            </div>
+          )}
           {isLoading && (
             <div className="text-center text-muted-foreground">Loading messages...</div>
           )}
