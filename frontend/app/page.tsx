@@ -15,7 +15,7 @@ import {
   usePublicClient,
 } from "wagmi";
 import { NEON_CRYPT_ABI, getNeonCryptAddress } from "@/lib/contracts/neonCrypt";
-import { encryptUint32, decryptUint32, stringToUint32, uint32ToString } from "@/lib/fhevm";
+import { encryptUint32, decryptUint32, stringToUint32, uint32ToString, clearFhevmCache } from "@/lib/fhevm";
 
 interface Message {
   id: string;
@@ -38,6 +38,20 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [previousChainId, setPreviousChainId] = useState<number | undefined>(undefined);
+
+  // Clear FHEVM cache when network changes
+  useEffect(() => {
+    if (chainId && previousChainId && chainId !== previousChainId) {
+      console.log(`Network changed from ${previousChainId} to ${chainId}, clearing FHEVM cache`);
+      clearFhevmCache();
+      setMessages([]);
+      toast.info("Network changed", {
+        description: "FHEVM cache cleared for new network",
+      });
+    }
+    setPreviousChainId(chainId);
+  }, [chainId, previousChainId]);
 
   // Get contract address for current chain
   let contractAddress: `0x${string}` | undefined;
