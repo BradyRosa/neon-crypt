@@ -10,6 +10,9 @@ interface ChatMessageProps {
   isOwn?: boolean;
   onDecrypt?: () => void;
   canDecrypt?: boolean;
+  onDelete?: () => void;
+  canDelete?: boolean;
+  isDeleting?: boolean;
 }
 
 export const ChatMessage = ({
@@ -20,6 +23,9 @@ export const ChatMessage = ({
   isOwn = false,
   onDecrypt,
   canDecrypt,
+  onDelete,
+  canDelete,
+  isDeleting = false,
 }: ChatMessageProps) => {
   return (
     <div
@@ -63,16 +69,50 @@ export const ChatMessage = ({
 
         <div className="text-sm text-foreground/90 break-words leading-relaxed flex items-center gap-3">
           <span>{message}</span>
-          {isEncrypted && onDecrypt && (
-            <button
-              onClick={onDecrypt}
-              disabled={!canDecrypt}
-              className="text-xs px-2 py-1 rounded bg-muted hover:bg-muted/80 disabled:opacity-50 transition-colors"
-              title={canDecrypt ? "Decrypt message" : "Connect and authenticate to decrypt"}
-            >
-              Decrypt
-            </button>
-          )}
+          <div className="flex items-center gap-2 ml-auto">
+            {isEncrypted && onDecrypt && (
+              <button
+                onClick={onDecrypt}
+                disabled={!canDecrypt}
+                className="text-xs px-2 py-1 rounded bg-muted hover:bg-muted/80 disabled:opacity-50 transition-colors"
+                title={canDecrypt ? "Decrypt message" : "Connect and authenticate to decrypt"}
+              >
+                Decrypt
+              </button>
+            )}
+            {isOwn && onDelete && (
+              <button
+                onClick={onDelete}
+                disabled={!canDelete || isDeleting}
+                className="text-xs px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 disabled:opacity-50 transition-colors"
+                title={canDelete ? "Delete message" : "Cannot delete"}
+              >
+                {isDeleting ? (
+                  <svg
+                    className="w-3 h-3 animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
