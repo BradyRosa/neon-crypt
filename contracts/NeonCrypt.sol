@@ -52,6 +52,9 @@ contract NeonCrypt is SepoliaConfig {
         externalEuint32 encryptedContent,
         bytes calldata inputProof
     ) external {
+        // Validate input proof is not empty
+        require(inputProof.length > 0, "Input proof cannot be empty");
+
         // Convert external encrypted input to internal euint32
         euint32 content = FHE.fromExternal(encryptedContent, inputProof);
 
@@ -207,6 +210,17 @@ contract NeonCrypt is SepoliaConfig {
         msg_.isActive = false;
 
         emit MessageDeleted(msg.sender, messageId);
+    }
+
+    /// @notice Check if a message exists and is active
+    /// @param messageId The ID of the message to check
+    /// @return exists Whether the message exists
+    /// @return active Whether the message is active
+    function isMessageActive(uint256 messageId) external view returns (bool exists, bool active) {
+        if (messageId >= _totalMessages) {
+            return (false, false);
+        }
+        return (true, _messages[messageId].isActive);
     }
 }
 
