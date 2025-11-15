@@ -187,5 +187,91 @@ describe("NeonCrypt", function () {
     expect(aliceCount).to.eq(2);
     expect(bobCount).to.eq(0);
   });
+
+  it("should revert when getting non-existent message", async function () {
+    await expect(
+      neonCryptContract.getMessage(999)
+    ).to.be.revertedWith("Message does not exist");
+  });
+
+  it("should not allow deleting already deleted message", async function () {
+    // Submit a message
+    const encryptedMessage = await fhevm
+      .createEncryptedInput(neonCryptContractAddress, signers.alice.address)
+      .add32(12345)
+      .encrypt();
+
+    await neonCryptContract
+      .connect(signers.alice)
+      .submitMessage(encryptedMessage.handles[0], encryptedMessage.inputProof);
+
+    // Delete the message
+    await neonCryptContract.connect(signers.alice).deleteMessage(0);
+
+    // Try to delete again - should fail
+    await expect(
+      neonCryptContract.connect(signers.alice).deleteMessage(0)
+    ).to.be.revertedWith("Message already deleted");
+  });
+
+  it("should check message active status correctly", async function () {
+    // Check non-existent message
+    const [exists1, active1] = await neonCryptContract.isMessageActive(999);
+    expect(exists1).to.eq(false);
+    expect(active1).to.eq(false);
+
+    // Submit a message
+    const encryptedMessage = await fhevm
+      .createEncryptedInput(neonCryptContractAddress, signers.alice.address)
+      .add32(54321)
+      .encrypt();
+
+    await neonCryptContract
+      .connect(signers.alice)
+      .submitMessage(encryptedMessage.handles[0], encryptedMessage.inputProof);
+
+    // Check existing active message
+    const [exists2, active2] = await neonCryptContract.isMessageActive(0);
+    expect(exists2).to.eq(true);
+    expect(active2).to.eq(true);
+
+    // Delete and check again
+    await neonCryptContract.connect(signers.alice).deleteMessage(0);
+    const [exists3, active3] = await neonCryptContract.isMessageActive(0);
+    expect(exists3).to.eq(true);
+    expect(active3).to.eq(false);
+  });
+
+  it("should handle batch message retrieval", async function () {
+    // Submit 3 messages
+    for (let i = 0; i < 3; i++) {
+      const encryptedMessage = await fhevm
+        .createEncryptedInput(neonCryptContractAddress, signers.alice.address)
+        .add32(i * 1000)
+        .encrypt();
+
+      await neonCryptContract
+        .connect(signers.alice)
+        .submitMessage(encryptedMessage.handles[0], encryptedMessage.inputProof);
+    }
+
+    // Batch retrieve messages
+    const [timestamps, senders, activeStatuses] = await neonCryptContract.getMessagesBatch([0, 1, 2]);
+
+    expect(timestamps.length).to.eq(3);
+    expect(senders.length).to.eq(3);
+    expect(activeStatuses.length).to.eq(3);
+
+    for (let i = 0; i < 3; i++) {
+      expect(senders[i]).to.eq(signers.alice.address);
+      expect(activeStatuses[i]).to.eq(true);
+    }
+  });
+
+  it("should revert batch retrieval with invalid message ID", async function () {
+    await expect(
+      neonCryptContract.getMessagesBatch([0, 999])
+    ).to.be.revertedWith("Message does not exist");
+  });
 });
 
