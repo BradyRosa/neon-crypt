@@ -1,15 +1,30 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useChainId } from "wagmi";
+import { hardhat, sepolia } from "wagmi/chains";
 
 interface ChatHeaderProps {
   isConnected: boolean;
   onConnect?: () => void;
 }
 
-export const ChatHeader = ({ isConnected: _isConnected, onConnect: _onConnect }: ChatHeaderProps) => {
-  // Props reserved for future use (network status indicators, manual connect trigger)
-  void _isConnected;
+const getNetworkInfo = (chainId: number | undefined) => {
+  if (!chainId) return null;
+  switch (chainId) {
+    case hardhat.id:
+      return { name: "Hardhat", color: "bg-yellow-500", textColor: "text-yellow-600" };
+    case sepolia.id:
+      return { name: "Sepolia", color: "bg-purple-500", textColor: "text-purple-600" };
+    default:
+      return { name: "Unknown", color: "bg-gray-500", textColor: "text-gray-600" };
+  }
+};
+
+export const ChatHeader = ({ isConnected, onConnect: _onConnect }: ChatHeaderProps) => {
+  const chainId = useChainId();
+  const networkInfo = isConnected ? getNetworkInfo(chainId) : null;
+
   void _onConnect;
   return (
     <header className="border-b border-border bg-card/80 backdrop-blur-md shadow-sm">
@@ -39,7 +54,18 @@ export const ChatHeader = ({ isConnected: _isConnected, onConnect: _onConnect }:
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {isConnected && networkInfo && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-md">
+              <span className={`w-2 h-2 rounded-full ${networkInfo.color} animate-pulse`} />
+              <span className={`text-xs font-medium ${networkInfo.textColor}`}>
+                {networkInfo.name}
+              </span>
+              {chainId === hardhat.id && (
+                <span className="text-xs text-muted-foreground">(Local)</span>
+              )}
+            </div>
+          )}
           <div className="shadow-md hover:shadow-lg transition-all rounded-md">
             <ConnectButton
               label="Connect Wallet"
