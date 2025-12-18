@@ -6,7 +6,7 @@
 
 [Watch Demo Video](./demo.mp4)
 
-**Live Demo**: [https://neon-crypt-phi.vercel.app/](https://neon-crypt-phi.vercel.app/)
+**Live Demo**: [https://neon-crypt-phi.vercel.app/](https://neon-crypt-six.vercel.app/)
 
 ## ✨ Features
 

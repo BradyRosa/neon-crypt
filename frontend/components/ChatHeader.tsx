@@ -27,12 +27,12 @@ export const ChatHeader = ({ isConnected, onConnect: _onConnect }: ChatHeaderPro
 
   void _onConnect;
   return (
-    <header className="border-b border-border bg-card/80 backdrop-blur-md shadow-sm">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border/50 bg-white/80 backdrop-blur-md shadow-sm">
+      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg">
+          <div className="w-11 h-11 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
             <svg
-              className="w-6 h-6 text-primary-foreground"
+              className="w-6 h-6 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -42,35 +42,32 @@ export const ChatHeader = ({ isConnected, onConnect: _onConnect }: ChatHeaderPro
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
               />
             </svg>
           </div>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-gray-800">
               NeonCrypt
             </h1>
-            <p className="text-xs text-muted-foreground">FHE-powered encrypted messaging</p>
+            <p className="text-xs text-gray-500">🔒 FHE Encrypted Messaging</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {isConnected && networkInfo && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-md">
-              <span className={`w-2 h-2 rounded-full ${networkInfo.color} animate-pulse`} />
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <span className={`w-2 h-2 rounded-full ${networkInfo.color}`} />
               <span className={`text-xs font-medium ${networkInfo.textColor}`}>
                 {networkInfo.name}
               </span>
-              {chainId === hardhat.id && (
-                <span className="text-xs text-muted-foreground">(Local)</span>
-              )}
             </div>
           )}
-          <div className="shadow-md hover:shadow-lg transition-all rounded-md">
+          <div className="shadow-sm hover:shadow-md transition-all rounded-lg">
             <ConnectButton
               label="Connect Wallet"
               accountStatus="avatar"
-              chainStatus="full"
+              chainStatus="icon"
               showBalance={false}
             />
           </div>

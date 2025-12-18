@@ -34,9 +34,9 @@ export const ChatInput = ({ onSend, disabled = false, isLoading = false }: ChatI
   };
 
   return (
-    <div className="border-t border-border bg-card/80 backdrop-blur-md shadow-lg">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex gap-2 max-w-4xl mx-auto">
+    <div className="border-t border-gray-200 bg-white/80 backdrop-blur-md shadow-lg">
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex gap-3 max-w-3xl mx-auto">
           <div className="flex-1 relative">
             <Input
               value={message}
@@ -44,13 +44,13 @@ export const ChatInput = ({ onSend, disabled = false, isLoading = false }: ChatI
               onKeyDown={handleKeyDown}
               placeholder={disabled ? "Connect wallet to send messages..." : "Type your message..."}
               disabled={disabled}
-              className="bg-background border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              className="bg-white border-gray-200 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all rounded-xl h-12 px-4"
             />
           </div>
           <Button
             onClick={handleSend}
             disabled={disabled || !message.trim() || isSending || isLoading}
-            className="gap-2 shadow-md hover:shadow-lg transition-all min-w-[100px]"
+            className="gap-2 shadow-md hover:shadow-lg transition-all min-w-[110px] h-12 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700"
           >
             {isSending || isLoading ? (
               <>
@@ -58,7 +58,6 @@ export const ChatInput = ({ onSend, disabled = false, isLoading = false }: ChatI
                   className="w-4 h-4 animate-spin"
                   fill="none"
                   viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <circle
                     className="opacity-25"
@@ -83,7 +82,6 @@ export const ChatInput = ({ onSend, disabled = false, isLoading = false }: ChatI
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
                     strokeLinecap="round"
@@ -97,13 +95,12 @@ export const ChatInput = ({ onSend, disabled = false, isLoading = false }: ChatI
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center max-w-4xl mx-auto flex items-center justify-center gap-1">
+        <p className="text-xs text-gray-500 mt-3 text-center max-w-3xl mx-auto flex items-center justify-center gap-1.5">
           <svg
-            className="w-3 h-3"
+            className="w-3.5 h-3.5 text-purple-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
